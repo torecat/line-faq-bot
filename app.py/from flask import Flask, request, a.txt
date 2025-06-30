@@ -13,12 +13,10 @@ handler = WebhookHandler(os.environ["LINE_CHANNEL_SECRET"])
 def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
-
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-
     return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -28,13 +26,3 @@ def handle_message(event):
         "営業時間": "営業時間は10:00〜20:00です。",
         "送料": "送料は全国一律500円です。",
         "支払い方法": "クレジットカード・コンビニ払い・銀行振込が使えます。",
-    }
-    response = faq.get(text, "申し訳ありません。その質問にはまだ対応していません。")
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=response)
-    )
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
